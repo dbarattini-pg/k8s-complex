@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: postgres
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      volumes:
+        - name: postgres-storage
+          persistentVolumeClaim: # request a PVC
+            claimName: database-persistent-volume-claim
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-storage # match the volume name
+              mountPath: /var/lib/postgresql/data # replace the container path with the specified volume
+              subPath: postgres # save mountPath data into the subPath folder within the volume
+          env:
+            - name: POSTGRES_PASSWORD # env name required by the container
+              valueFrom:
+                secretKeyRef:
+                  name: pgpassword # secret name
+                  key: PG_PASSWORD # required value key inside the secret

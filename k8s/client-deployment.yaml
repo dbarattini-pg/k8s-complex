@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-deployment # object name; pod name : <object name>-<random string>
+spec:
+  replicas: 3 # number of pods to deploy
+  selector:
+    matchLabels: # manage pods with matching label
+      component: web # fe component
+  template: # pod template
+    metadata:
+      labels:
+        component: web 
+    spec:
+      containers:
+        - name: client
+          image: dbarattinipg/complex-client
+          ports:
+            - containerPort: 3000
